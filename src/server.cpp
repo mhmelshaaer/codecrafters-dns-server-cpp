@@ -4,6 +4,8 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
+#include "dns.hpp"
+
 int main() {
     // Flush after every std::cout / std::cerr
     std::cout << std::unitbuf;
@@ -55,14 +57,23 @@ int main() {
             break;
         }
 
-        buffer[bytesRead] = '\0';
-        std::cout << "Received " << bytesRead << " bytes: " << buffer << std::endl;
+        // process DNS requests
+        net::dns::header req_header;
+        memcpy(req_header.value, buffer, 12); // Copy raw bytes into the union
+        printf("Transaction ID (host-byte order): %u\n", ntohs(req_header.fields.id));
+        printf("Transaction ID (network-byte order): %u\n", req_header.fields.id);
 
-        // Create an empty response
-        char response[1] = { '\0' };
+        net::dns::header res_header{
+          .fields = {
+            .id = htons(1234),
+            .flags { .value = htons(0x01) },
+        }};
+
+        buffer[bytesRead] = '\0';
+        std::cout << "Received " << bytesRead << " bytes" << std::endl;
 
         // Send response
-        if (sendto(udpSocket, response, sizeof(response), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), sizeof(clientAddress)) == -1) {
+        if (sendto(udpSocket, res_header.value, sizeof(net::dns::header), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), sizeof(clientAddress)) == -1) {
             perror("Failed to send response");
         }
     }
