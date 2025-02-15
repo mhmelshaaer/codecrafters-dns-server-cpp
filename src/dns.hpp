@@ -25,7 +25,7 @@ typedef union {
   struct {
     uint16_t id{0};
 
-    net::dns::flags flags{.value{0x00}};
+    net::dns::flags flags{.value{0x0000}};
 
     uint16_t qdcount{0};
     uint16_t ancount{0};

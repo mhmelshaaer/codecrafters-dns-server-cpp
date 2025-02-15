@@ -45,7 +45,7 @@ int main() {
         return 1;
     }
 
-    int bytesRead;
+    int bytesRead, bytesSend;
     char buffer[512];
     socklen_t clientAddrLen = sizeof(clientAddress);
 
@@ -63,19 +63,23 @@ int main() {
         printf("Transaction ID (host-byte order): %u\n", ntohs(req_header.fields.id));
         printf("Transaction ID (network-byte order): %u\n", req_header.fields.id);
 
-        net::dns::header res_header{
-          .fields = {
-            .id = htons(1234),
-            .flags { .value = htons(0x01) },
-        }};
+        net::dns::header res_header{};
+        res_header.fields.id = ntohs(res_header.fields.id);
+        res_header.fields.flags.value = ntohs(res_header.fields.flags.value);
+        res_header.fields.id = 1234;
+        res_header.fields.flags.value = 0x8000;
+        res_header.fields.flags.value = htons(res_header.fields.flags.value);
+        res_header.fields.id = htons(res_header.fields.id);
 
         buffer[bytesRead] = '\0';
         std::cout << "Received " << bytesRead << " bytes" << std::endl;
 
         // Send response
-        if (sendto(udpSocket, res_header.value, sizeof(net::dns::header), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), sizeof(clientAddress)) == -1) {
-            perror("Failed to send response");
+        bytesSend = sendto(udpSocket, res_header.value, sizeof(net::dns::header), 0, reinterpret_cast<struct sockaddr*>(&clientAddress), sizeof(clientAddress));
+        if (bytesSend == -1) {
+          perror("Failed to send response");
         }
+        std::cout << "Sent " << bytesSend << " bytes" << std::endl;
     }
 
     close(udpSocket);
