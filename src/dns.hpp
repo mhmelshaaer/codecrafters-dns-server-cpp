@@ -6,12 +6,25 @@ namespace net {
 namespace dns {
 
 #pragma pack(push, 1)  // Ensure no padding
-typedef union {
+/**
+ * @brief DNS header flags field.
+ * @details
+ * The DNS flags field is a 16-bit field with the following values:
+ *
+ * | 0  | 1 | 2 | 3 |4 | 5  | 6  | 7  | 8  |9|10|11|12|13|14|15|
+ * | QR |    OPCODE    | AA | TC | RD | RA |   Z   |   RCODE   |
+ *
+ * Note that the QR is the most significant bit in the 16-bit field
+ * while the RCODE is the least significant 4 bits. Therefore, the
+ * union follows the LSB ordering so it will start with the RCODE
+ * and end with the QR.
+ *
+ */
+typedef union flags {
   struct {
     uint16_t rcode : 4;
     uint16_t z : 3;
     uint16_t ra : 1;
-
     uint16_t rd : 1;
     uint16_t tc : 1;
     uint16_t aa : 1;
