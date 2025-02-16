@@ -8,14 +8,15 @@ namespace dns {
 #pragma pack(push, 1)  // Ensure no padding
 typedef union {
   struct {
-    uint16_t qr : 1;
-    uint16_t opcode : 4;
-    uint16_t aa : 1;
-    uint16_t tc : 1;
-    uint16_t rd : 1;
-    uint16_t ra : 1;
-    uint16_t z : 3;
     uint16_t rcode : 4;
+    uint16_t z : 3;
+    uint16_t ra : 1;
+
+    uint16_t rd : 1;
+    uint16_t tc : 1;
+    uint16_t aa : 1;
+    uint16_t opcode : 4;
+    uint16_t qr : 1;
   } bits; // Named struct to ensure no padding.
 
   uint16_t value{0};
