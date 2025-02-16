@@ -17,7 +17,7 @@ namespace dns {
  * Note that the QR is the most significant bit in the 16-bit field
  * while the RCODE is the least significant 4 bits. Therefore, the
  * union follows the LSB ordering so it will start with the RCODE
- * field and end with the QR field.
+ * and end with the QR.
  *
  */
 typedef union flags {
