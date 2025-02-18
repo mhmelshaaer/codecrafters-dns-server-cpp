@@ -64,13 +64,10 @@ int main() {
         printf("Transaction ID (network-byte order): %u\n", req_header.fields.id);
 
         // Prepare response
-        net::dns::header res_header{};
-        res_header.fields.id = ntohs(res_header.fields.id);
-        res_header.fields.flags.value = ntohs(res_header.fields.flags.value);
-        res_header.fields.id = 1234;
-        res_header.fields.flags.bits.qr = 1;
-        res_header.fields.flags.value = htons(res_header.fields.flags.value);
-        res_header.fields.id = htons(res_header.fields.id);
+        net::dns::header res_header{
+          .fields { .id { htons(1234) },
+          .flags { .value { htons(0x8000) } } }
+        };
 
         buffer[bytesRead] = '\0';
         std::cout << "Received " << bytesRead << " bytes" << std::endl;
